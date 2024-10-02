@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📰️ News flash</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    }
+
+    .markdown-content ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .markdown-content li {
+      margin-bottom: 0.5rem;
+    }
+
+    h3 {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
+    <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">📰️ News Flash</h1>
+    <form id="news-form" class="space-y-4">
+      <div>
+        <label for="company_name" class="block text-sm font-medium text-gray-700">Company name</label>
+        <input type="text" id="company_name" required
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2 border border-gray-200">
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="start_date" class="block text-sm font-medium text-gray-700">Start date</label>
+          <input type="date" id="start_date" required
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2 border border-gray-200">
+        </div>
+        <div>
+          <label for="end_date" class="block text-sm font-medium text-gray-700">End date</label>
+          <input type="date" id="end_date" required
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2 border border-gray-200">
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="toggle-custom-instructions"
+          class="text-indigo-600 hover:text-indigo-800 focus:outline-none">
+          + Advanced Options
+        </button>
+        <div id="custom-instructions-block" class="hidden mt-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2 mt-4">News types</label>
+          <div class="space-y-2">
+            <div>
+              <input type="checkbox" id="merger" name="news_types" value="Merger or acquisition"
+                class="rounded text-indigo-600 focus:ring-indigo-500">
+              <label for="merger" class="ml-2 text-sm text-gray-700">Merger or acquisition</label>
+            </div>
+            <div>
+              <input type="checkbox" id="investment" name="news_types" value="New investment round"
+                class="rounded text-indigo-600 focus:ring-indigo-500">
+              <label for="investment" class="ml-2 text-sm text-gray-700">New investment round</label>
+            </div>
+            <div>
+              <input type="checkbox" id="projects" name="news_types" value="Projects"
+                class="rounded text-indigo-600 focus:ring-indigo-500">
+              <label for="projects" class="ml-2 text-sm text-gray-700">Projects</label>
+            </div>
+            <div>
+              <input type="checkbox" id="partnerships" name="news_types" value="Partnerships"
+                class="rounded text-indigo-600 focus:ring-indigo-500">
+              <label for="partnerships" class="ml-2 text-sm text-gray-700">Partnerships</label>
+            </div>
+            <div>
+              <input type="checkbox" id="awards" name="news_types" value="Awards"
+                class="rounded text-indigo-600 focus:ring-indigo-500">
+              <label for="awards" class="ml-2 text-sm text-gray-700">Awards</label>
+            </div>
+            <div>
+              <input type="checkbox" id="launches" name="news_types" value="Launches"
+                class="rounded text-indigo-600 focus:ring-indigo-500">
+              <label for="launches" class="ml-2 text-sm text-gray-700">Launches</label>
+            </div>
+            <div>
+              <input type="checkbox" id="relocation" name="news_types" value="Relocation or new offices"
+                class="rounded text-indigo-600 focus:ring-indigo-500">
+              <label for="relocation" class="ml-2 text-sm text-gray-700">Relocation or new offices</label>
+            </div>
+            <div>
+              <input type="checkbox" id="team_growth" name="news_types" value="Team growth"
+                class="rounded text-indigo-600 focus:ring-indigo-500">
+              <label for="team_growth" class="ml-2 text-sm text-gray-700">Team growth</label>
+            </div>
+          </div>
+          <label for="custom_instructions" class="block text-sm font-medium text-gray-700 mt-4">Custom
+            Instructions</label>
+          <textarea id="custom_instructions" rows="4"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 px-4 py-2 border border-gray-200"></textarea>
+        </div>
+      </div>
+
+      <button type="submit"
+        class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition duration-150 ease-in-out">
+        Summarize news
+      </button>
+    </form>
+
+    <div id="progress" class="mt-4 hidden">
+      <p class="text-gray-600 mb-2">Processing...</p>
+      <div class="animate-pulse flex space-x-4">
+        <div class="flex-1 space-y-4 py-1">
+          <div class="h-4 bg-slate-400 rounded w-3/4"></div>
+          <div class="h-4 bg-slate-400 rounded"></div>
+          <div class="h-4 bg-slate-400 rounded w-5/6"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="result" class="mt-8 p-4 bg-gray-50 rounded-md hidden"></div>
+  </div>
+
+  <script>
+    // Set default dates when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function () {
+      const today = new Date();
+      const sixMonthsAgo = new Date(today);
+      sixMonthsAgo.setMonth(today.getMonth() - 6);
+
+      // Format dates
+      const formatDate = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      // Set end date to today
+      document.getElementById('end_date').value = formatDate(today);
+
+      // Set start date to 6 months ago
+      document.getElementById('start_date').value = formatDate(sixMonthsAgo);
+    });
+
+    // Toggle custom instructions visibility
+    document.getElementById('toggle-custom-instructions').addEventListener('click', function () {
+      const block = document.getElementById('custom-instructions-block');
+      const button = document.getElementById('toggle-custom-instructions');
+      if (block.classList.contains('hidden')) {
+        block.classList.remove('hidden');
+        button.textContent = '- Advanced Options';
+      } else {
+        block.classList.add('hidden');
+        button.textContent = '+ Advanced Options';
+      }
+    });
+
+    document.getElementById('news-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = {
+        company_name: document.getElementById('company_name').value,
+        start_date: document.getElementById('start_date').value,
+        end_date: document.getElementById('end_date').value,
+        news_types: Array.from(document.querySelectorAll('input[name="news_types"]:checked')).map(checkbox => checkbox.value),
+        num_articles: 5,  // Fixed value of 5
+        custom_instructions: document.getElementById('custom_instructions').value
+      };
+
+      // If no news types are selected, set it to an empty array
+      if (formData.news_types.length === 0) {
+        formData.news_types = [];
+      }
+
+      // Show progress indicator
+      document.getElementById('progress').classList.remove('hidden');
+      document.getElementById('result').classList.add('hidden');
+
+      // Scroll to progress indicator
+      document.getElementById('progress').scrollIntoView({ behavior: 'smooth' });
+
+      try {
+        const response = await fetch('/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        // Hide progress indicator and show result
+        document.getElementById('progress').classList.add('hidden');
+        document.getElementById('result').classList.remove('hidden');
+
+        document.getElementById('result').innerHTML = `
+          <h2 class="text-xl font-semibold mb-2">Summary:</h2>
+          <div class="whitespace-pre-wrap markdown-content">${marked.parse(result.summary)}</div>
+        `;
+
+        // Scroll to result
+        document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('progress').classList.add('hidden');
+        document.getElementById('result').classList.remove('hidden');
+        document.getElementById('result').innerHTML = `
+          <h2 class="text-xl font-semibold mb-2 text-red-600">Error:</h2>
+          <p>An error occurred while processing your request. Please try again.</p>
+        `;
+        document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  </script>
+</body>
+
+</html>
